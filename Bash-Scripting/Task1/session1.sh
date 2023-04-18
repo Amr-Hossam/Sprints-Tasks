@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo " "
 echo "This script will print variables, and execute Linux commands"
 echo "  "
@@ -26,6 +25,10 @@ function list_files(){
         echo "exit code $? "
 }
 echo "Env details: "
+echo "  "
 current_directory
+echo "  "
 current_user
+echo "  "
 list_files
+echo "  "
