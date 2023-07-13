@@ -1,0 +1,2 @@
+[node]
+web01 ansible_host=54.196.90.226 ansible_user=ubuntu ansible_private_key_file=app-key.pem

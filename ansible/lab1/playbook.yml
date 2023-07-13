@@ -1,0 +1,20 @@
+- hosts: node
+  become: yes
+  tasks:
+    - name: Install Node.js and npm
+      apt:
+        name: ['nodejs', 'npm']
+        state: present
+
+    - name: Clone the Node.js app repository
+      git:
+        repo: https://github.com/sabreensalama/dockerize-node-app-task/
+        dest: /opt/myapp
+
+    - name: Install the Node.js app dependencies
+      npm:
+        path: /opt/myapp
+        state: latest
+
+    - name: Run the Node.js app
+      shell: node /opt/myapp/server.js &
