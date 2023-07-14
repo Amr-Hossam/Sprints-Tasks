@@ -1,6 +1,10 @@
 - hosts: node
   become: yes
   tasks:
+    - name: "Update Repository cache"
+      apt:
+        update_cache: yes
+        
     - name: Install Node.js and npm
       apt:
         name: ['nodejs', 'npm']
