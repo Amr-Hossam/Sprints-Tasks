@@ -1,0 +1,113 @@
+---
+# tasks file for sonarqube
+- name: Update apt cache
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Install wget
+  apt:
+    name: wget
+    state: present
+  become: true
+
+- name: Install unzip
+  apt:
+    name: unzip
+    state: present
+  become: true
+
+- name: Install OpenJDK 11 on Ubuntu
+  become: true
+  apt:
+    name: openjdk-11-jdk
+    state: present
+
+- name: Install PostgreSQL
+  become: true
+  apt:
+    name: 
+      - postgresql
+      - postgresql-contrib
+    state: present
+
+- name: Import PostgreSQL repository key
+  become: true
+  shell: curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/apt.postgresql.org.gpg >/dev/null
+
+- name: Add PostgreSQL repository
+  become: true
+  lineinfile:
+    dest: /etc/apt/sources.list.d/pgdg.list
+    line: "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main"
+    create: yes
+
+- name: Create sonaruser role and sonarqube database
+  become: true
+  become_user: sonarqube
+  postgresql_user:
+    db: sonarqube
+    name: sonarqube
+    password: sonarqube
+    login_user: sonarqube
+    login_password: sonarqube
+    login_host: localhost
+    login_unix_socket: /var/run/postgresql/
+
+- name: Create sonarqube database
+  become: true
+  become_user: sonarqube
+  postgresql_db:
+    name: sonarqube
+    login_user: sonarqube
+    login_password: sonarqube
+    login_host: localhost
+    login_unix_socket: /var/run/postgresql/
+
+- name: Grant privileges on sonarqube database to sonaruser role
+  become: true
+  become_user: postgres
+  postgresql_privs:
+    db: postgres
+    privs: ALL
+    roles: sonarqube
+    login_user: sonarqube
+    login_password: sonarqube
+    login_host: localhost
+    login_unix_socket: /var/run/postgresql/
+
+- name: Download SonarQube archive
+      get_url:
+        url: "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.6.1.59531.zip"
+        dest: "/tmp/sonarqube-9.6.1.59531.zip"
+
+- name: Unzip SonarQube archive
+  unarchive:
+    src: "/tmp/sonarqube-9.6.1.59531.zip"
+    dest: "/opt"
+    remote_src: true
+    creates: "/opt/sonarqube-9.6.1.59531"
+
+- name: Create SonarQube system user
+      user:
+        name: sonarqube
+        system: yes
+        shell: /bin/false
+        home: /opt/sonarqube
+        create_home: no
+        group: sonarqube
+
+- name: Set ownership of SonarQube directory
+  file:
+    path: /opt/sonarqube
+    owner: sonarqube
+    group: sonarqube
+    recurse: yes
+    state: directory
+
+- name: Start SonarQube service
+  become: true
+  systemd:
+    name: sonarqube
+    state: started
+    

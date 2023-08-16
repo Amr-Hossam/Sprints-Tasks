@@ -1,0 +1,7 @@
+---
+# vars file for sonarqube
+
+sonarqube_version: '9.6.1.59531'
+# sonarqube_db_type: postgresql
+sonarqube_db_username: "sonarqube"
+sonarqube_db_password: "sonarqube"

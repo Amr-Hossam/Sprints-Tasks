@@ -1,0 +1,11 @@
+---
+# handlers file for sonarqube
+
+- name: Restart postgresql
+  services:
+    name: postgresql
+    state: restarted
+
+- name: Update Cache
+  apt:
+    update_cache: yes

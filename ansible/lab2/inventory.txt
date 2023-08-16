@@ -1,0 +1,2 @@
+[sonarqube]
+app ansible_host= ansible_user=ubuntu ansible_private_key_file=
